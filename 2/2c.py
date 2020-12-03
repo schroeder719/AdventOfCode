@@ -1,13 +1,22 @@
 import os
 from colorama import Fore, Back, Style, init
+import re
 
 class Password:
     def __init__(self, line):
-        v = line.split(" ")
-        self.one = int(v[0].split("-")[0])
-        self.two = int(v[0].split("-")[1])
-        self.reqchr = v[1][0]
-        self.pass_string = v[2]
+        #cre = re.compile(r"^(\d+)-(\d+) ([a-z]{1}): ([a-z]+)")
+        #result = cre.match(string=line)
+        result = re.match(r"^(\d+)-(\d+) ([a-z]{1}): ([a-z]+)", line)
+        if result:
+            #print("{} matches".format(result.groups()))
+            self.one = int(result.group(1))
+            self.two = int(result.group(2))
+            self.reqchr = result.group(3)
+            self.pass_string = result.group(4)
+        else:
+            print(line)
+            print("no match")
+            exit(1)
 
         #print("Must have between {} and {} {}'s in {}".format(self.min, self.max,self.reqchr,self.pass_string))
 
