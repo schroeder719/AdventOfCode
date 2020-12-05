@@ -33,7 +33,6 @@ class Passport:
         return False
 
     def fulltest(self):
-        result = True
         if not self.test():
             return False
 
@@ -78,7 +77,7 @@ class Passport:
             return False
 
         #hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
-        if not re.match(r"#[0-9a-f]{6}", self.fields['hcl']):
+        if not re.match(r"#[0-9a-f]{6}$", self.fields['hcl']):
             print("hcl: {}".format(self.fields['hcl']))
             return False
         
@@ -89,7 +88,7 @@ class Passport:
         #else:
          #   print("ecl pass: {}".format(self.fields['ecl']))
         #pid (Passport ID) - a nine-digit number, including leading zeroes.
-        if not re.match(r"[0-9]{9}", self.fields['pid']):
+        if not re.match(r"[0-9]{9}$", self.fields['pid']):
             print("pid: {}".format(self.fields['pid']))
             return False
         #cid (Country ID) - ignored, missing or not.
