@@ -37,7 +37,7 @@ class Graph:
         self.V = size
         self.graph = [None] * self.V
 
-    # Function to add an edge in an undirected graph 
+    # Function to add an edge in an directed graph 
     def add_edge(self, src, dest, weight=0):
         # Adding the node to the source node 
         node = AdjNode(dest,weight) 
@@ -48,12 +48,6 @@ class Graph:
             while temp.next: 
                 temp = temp.next
             temp.next = node 
-
-        # Adding the source node to the destination as 
-        # it is the undirected graph 
-        #node = AdjNode(src, weight)
-        #node.next = self.graph[dest] 
-        #self.graph[dest] = node 
 
     # Function to print the graph 
     def print_graph(self): 
@@ -74,64 +68,14 @@ class Graph:
                 temp = temp.next
             print(" \n") 
 
-    def count(self,ib,id):
-        total = 0
-        contains = []
-        for i in range(self.V): 
-            #print("Adjacency list of vertex {}\n head".format(i), end="") 
-            if i == id:
-                continue
-            temp = self.graph[i] 
-            while temp: 
-                if temp.vertex == id:
-                    #print(" -> {}[{}]".format(ib[temp.vertex],temp.weight), end="") 
-                    print("{} contains {}".format(ib[i], ib[id]))
-                    if not i in contains:
-                        contains.append(i)
-                temp = temp.next
-        for i in contains:
-            total+= self.count(ib, i)
-        return total
-
-    def countc(self,ib,id, contains=None,visited=None):
-        root = False
-        if contains is None:
-            root = True
-            contains = []
-        if visited is None:
-            visited = []
-        for i in range(self.V):
-            if self.graph[i] is None:
-                continue
-            #print("Adjacency list of vertex {}\n head".format(i), end="") 
-            #print(i)
-            temp = self.graph[i]
-            while temp: 
-                if temp.vertex == id:
-                    #print(" -> {}[{}]".format(ib[temp.vertex],temp.weight), end="") 
-                    print("{} contains {}".format(ib[i], ib[id]))
-                    if not i in contains:
-                        contains.append(i)
-                temp = temp.next
-            #visited.append(i)
-        for i in contains:
-            if i not in visited:
-                print("looking in {}".format(ib[i]))
-                visited.append(i)
-                self.countc(ib, i, contains, visited)
-        if root:
-            print("contains: {}".format(len(contains)))
-            #for i in contains:
-            #    print("{}: {}".format(i,ib[i]))
 
     def required(self,id):
         total = 1
         temp = self.graph[id]
-        #print(ib[id])
         if temp is not None:
             while temp:
                 req = self.required(temp.vertex)
-                print("{}+={}*{}".format(total,temp.weight,req))
+                #print("{}+={}*{}".format(total,temp.weight,req))
                 total += temp.weight * req 
                 
                 temp = temp.next
@@ -148,7 +92,6 @@ if __name__ == "__main__":
     ib = dict()
     for line in data:
         r = line.split(" bags contain ")
-        #print(r[0])
         if r[0] not in bi:
             bi[r[0]] = idx
             ib[idx] = r[0]
@@ -158,7 +101,6 @@ if __name__ == "__main__":
             e = re.match(r"^(\d+) ([a-z ]+) bags?\.?$",j)
             if e:
                 g = e.groups()
-                #print(g[1])
                 if g[1] not in bi:
                     bi[g[1]] = idx
                     ib[idx] = g[1]
@@ -170,7 +112,6 @@ if __name__ == "__main__":
     graph = Graph(V)
     for line in data:
         r = line.split(" bags contain ")
-        #print(r[0])
         id = bi[r[0]]
         rr = r[1].split(", ")
         for j in rr:
@@ -178,25 +119,9 @@ if __name__ == "__main__":
             if e:
                 g = e.groups()
                 graph.add_edge(id,bi[g[1]],int(g[0]))
-                #print(g[1])
-                #if g[1] not in bi:
-                #    bi[g[1]] = idx
-                #    idx+=1
             elif j != "no other bags.":
                 print("e error >{}<".format(j))                
                 exit
 
-    
-    #graph.countc(ib,bi['shiny gold'])
     result = graph.required(bi['shiny gold']) - 1
     print(result)
-    #graph.print_graph() 
-    #for key in bi:
-    #    print(key, '->', bi[key])
-    # for key in ib:
-    #     print(key, '->', ib[key])
-    
-    #print(ib[4])
-    #print(bi['shiny gold'])
-
-# # This code is contributed by Kanav Malhotra 
