@@ -1,6 +1,7 @@
 import os
 import re
 import queue
+import common.util as u
 
 def readfile(filename,lines=True):
     with open(os.path.join(os.getcwd(),filename)) as f:
@@ -86,7 +87,7 @@ class Graph:
 
 # Driver program to the above graph class 
 if __name__ == "__main__": 
-    data = readfile("2020\\7\\input.txt")
+    data = u.readfile(u.AOC_2020 + "\\7\\input.txt")
     idx = 0
     bi = dict()
     ib = dict()

@@ -1,5 +1,7 @@
 import os
 
+AOC_2020="AOC\\2020"
+
 def readfile(filename,lines=True):
     with open(os.path.join(os.getcwd(),filename)) as f:
         data = f.read()

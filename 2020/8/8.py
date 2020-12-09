@@ -1,7 +1,6 @@
 import os
 import re
-from common.util import readfile
-
+import common.util as u
 
 def run(data, tl):
 
@@ -34,7 +33,7 @@ def run(data, tl):
         #print(pc)
     
 
-data = readfile("2020\\8\\input.txt")
+data = u.readfile(u.AOC_2020 + "\\8\\input.txt")
 tl = 0
 for lines in data:
     tl+=1
