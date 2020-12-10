@@ -1,6 +1,6 @@
 
 class Computer:
-    def __init__(self):
+    def __init__(self, log):
         self.code = []
         self.pc = 0
         self.acc = 0
@@ -12,8 +12,10 @@ class Computer:
     def load(self,data):
         self.code = data
         self.cl = len(data) # code length
+    self.print()
 
     def run(self):
+        )
         result = True
         running = True
         rv = None

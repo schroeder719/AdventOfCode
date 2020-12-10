@@ -56,7 +56,7 @@ class Password:
 total_valid = 0
 total = 0
 init(autoreset=True)
-with open(os.path.join(os.getcwd(), "2020\\2\\input_2a.txt")) as f:
+with open(os.path.join(os.getcwd(), "AOC\\2020\\2\\input_2a.txt")) as f:
     for line in f:
         total+=1
         p = Password(line)

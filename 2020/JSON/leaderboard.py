@@ -4,12 +4,13 @@ import os
 import re
 import common.util as util
 import time
-import datetime
-from datetime import timezone
+
+from datetime import timezone, datetime
 
 
-dt = datetime.datetime(2021, 1, 1)
+dt = datetime(2022, 1, 1)
 FUTURE_TIME = dt.replace(tzinfo=timezone.utc).timestamp()
+BOTH = 4
 GOLD = 2
 SILVER = 1
 
@@ -106,7 +107,33 @@ class Users:
         #print(self.timestamps)
     
     def printDayReport(self,day, star):
-        pass
+        table = []
+        for u in self.users:
+            ts = u.getTimeStamps(day)
+            if ts[SILVER] == FUTURE_TIME and ts[GOLD] == FUTURE_TIME:
+                continue
+
+            if ts[1] == FUTURE_TIME or ts[1] == 0:
+                t1 = "-------------------" 
+                     
+            else:
+                t1 = datetime.fromtimestamp(ts[SILVER])
+            
+            if ts[2] == FUTURE_TIME or ts[2] == 0:
+                t2 = "-------------------"
+            else:
+                t2 = datetime.fromtimestamp(ts[GOLD])
+
+            if star == BOTH:
+                table.append((u.name,ts[SILVER], t1 , t2))
+            else:
+                table.append((u.name,ts[GOLD], t1, t2))
+        table.sort(key=lambda x: x[1])
+        for i in table:
+            if star == BOTH:
+                print("{: <30} {}    {}".format(i[0], i[2], i[3]))
+            else:
+                print("{: <30} {}".format(i[0], i[2]))
 
 
 
@@ -177,7 +204,7 @@ class Completion:
                     if d.gold_ts != 0:
                         print(Fore.YELLOW + "*", end="")
                     elif d.silver_ts != 0:
-                        print(Style.BRIGHT + Fore.WHITE + "*", end="")
+                        print(Style.BRIGHT + Fore.WHITE + "+", end="")
                     else:
                         print(Fore.BLUE + " ", end="")
             if not found:
@@ -204,4 +231,5 @@ users.print_users()
 #users.printFinishOrder()
 users.findFinishes()
 #users.printPlaces(1, SILVER)
-users.printFinishOrder()
+#users.printFinishOrder()
+users.printDayReport(9, BOTH)
