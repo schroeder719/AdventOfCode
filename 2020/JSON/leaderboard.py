@@ -86,7 +86,7 @@ class Users:
             #print(self.timestamps[d])
             place = 0
             for i in self.timestamps[d]:
-                if i[2] < FUTURE_TIME:
+                if i[1] < FUTURE_TIME and i[1] > 0:
                     place+=1
                     u = self.getUser(i[0])
                     #print("{} {}".format(u.name,place))
@@ -94,7 +94,7 @@ class Users:
             place = 0
             self.timestamps[d].sort(key=lambda x: x[2], reverse=False)
             for i in self.timestamps[d]:
-                if i[2] < FUTURE_TIME:
+                if i[2] < FUTURE_TIME and i[2] > 0:
                     place+=1
                     u = self.getUser(i[0])
                     #print("{} {}".format(u.name,place))
@@ -231,5 +231,5 @@ users.print_users()
 #users.printFinishOrder()
 users.findFinishes()
 #users.printPlaces(1, SILVER)
-#users.printFinishOrder()
-users.printDayReport(9, BOTH)
+users.printFinishOrder()
+users.printDayReport(10, BOTH)
