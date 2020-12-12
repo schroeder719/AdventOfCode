@@ -162,7 +162,7 @@ class Users:
         self.sfinish = []
         self.gfinish = []
         self.udict = {}
-
+        self.valid_days = []
         self.load()
 
     def load(self):
@@ -209,7 +209,7 @@ class Users:
         self.print_users()
         self.findFinishes()
         self.printFinishOrder()
-        for d in range(1,12):
+        for d in self.valid_days:
             users.printDayReport(d, BOTH)
             print("")
 
@@ -236,6 +236,8 @@ class Users:
                     u = self.getUser(i[0])
                     #print("{} {}".format(u.name,place))
                     u.setPlace(d,SILVER,place)
+            if place > 0:
+                self.valid_days.append(d+1)
             place = 0
             self.timestamps[d].sort(key=lambda x: x[2], reverse=False)
             for i in self.timestamps[d]:
@@ -253,6 +255,7 @@ class Users:
     
     def printDayReport(self,day, star):
         print("Day {}".format(day))
+        print("-"*75)
         table = []
         for u in self.users:
             ts = u.getTimeStamps(day)
