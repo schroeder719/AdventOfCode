@@ -20,7 +20,7 @@ def count(data):
                 occupied+=1
             elif c == ".":
                 floor+=1
-    return (empty,occupied,floor, empty+occupied+floor)
+    return (empty, occupied, floor, empty+occupied+floor)
 
 #return true if a seat is occupied
 def status1(data,r,c):   

@@ -4,9 +4,13 @@ import os
 import re
 import common.util as util
 import time
+import requests
 
 from datetime import timezone, datetime
-
+import browser_cookie3 as bc3
+import bs4
+import os
+from os import path
 
 dt = datetime(2022, 1, 1)
 FUTURE_TIME = dt.replace(tzinfo=timezone.utc).timestamp()
@@ -14,6 +18,142 @@ BOTH = 4
 GOLD = 2
 SILVER = 1
 
+class Data:
+    url_json = 'https://adventofcode.com/2020/leaderboard/private/view/614401.json'
+    datefile = util.AOC_COMMON + '/Leaderboard/timestamp'
+    sessionfile = util.AOC_COMMON + '/Leaderboard/session'
+    jsonfile = util.AOC_COMMON + '/Leaderboard/data.json'
+    min_elapsed_time = 900.0
+    
+    def __init__(self):
+        self.session = {}
+        self.checkStoredDate()
+        
+    def getDateFromFile(self):
+        try:
+            stored_time = datetime.fromtimestamp(float(self.getFromFile(self.datefile)))
+            return stored_time
+        except:
+            return None
+    
+
+    def getDateString(self, fmt="%m/%d/%Y, %H:%M:%S"):
+        dt = self.getDateFromFile()
+        if dt:
+            return dt.strftime(fmt)
+        else:
+            return None
+
+
+
+    def checkStoredDate(self):
+        date_good = True
+        if os.path.exists(self.datefile):
+            stored_time = self.getDateFromFile()
+            if stored_time:
+                now = datetime.now()
+                delta = now - stored_time
+                #print(delta.total_seconds())
+                if delta.total_seconds() > self.min_elapsed_time:
+                    date_good = False
+            else:
+                date_good = False
+        else:
+            date_good = False
+        if not date_good:
+            self.getJSON()
+
+    def updateStoredDate(self):
+        dt = datetime.now()
+        self.saveToFile(self.datefile,"{}".format(dt.timestamp()))
+
+    def getSessionCookie(self):
+        if self.getSessionCookieFromFile():
+            return True
+        else:
+            return self.getSessionCookieFromChrome()
+        
+    def getSessionCookieFromFile(self):
+        session = self.getFromFile(self.sessionfile)
+        if session:
+            self.session = json.loads(session)
+            return True
+        else:
+            return self.getSessionCookieFromChrome()
+        
+    def getSessionCookieFromChrome(self):
+        def get_owner(token):
+            """parse owner of the token. returns None if the token is expired/invalid"""
+            url = "https://adventofcode.com/settings"
+            response = requests.get(url, cookies={"session": token}, allow_redirects=False)
+            if response.status_code != 200:
+                # bad tokens will 302 redirect to main page
+            # log.info("session %s is dead - status_code=%s", token, response.status_code)
+                return None
+            result = "unknown/unknown"
+            soup = bs4.BeautifulSoup(response.text, "html.parser")
+            for span in soup.find_all("span"):
+                if span.text.startswith("Link to "):
+                    auth_source = span.text[8:]
+                    auth_source = auth_source.replace("https://twitter.com/", "twitter/")
+                    auth_source = auth_source.replace("https://github.com/", "github/")
+                    auth_source = auth_source.replace("https://www.reddit.com/u/", "reddit/")
+                    #log.debug("found %r", span.text)
+                    result = auth_source
+                elif span.img is not None:
+                    if "googleusercontent.com" in span.img.attrs.get("src", ""):
+                        #log.debug("found google user content img, getting google username")
+                        result = "google/" + span.text
+            return result
+
+        cookie_jar_chrome = bc3.chrome(domain_name=".adventofcode.com")
+        chrome = [c for c in cookie_jar_chrome if c.name == "session"]
+        #log.info("%d candidates from chrome", len(chrome))
+        working = {}
+        for cookie in chrome:
+            token = cookie.value
+            owner = get_owner(token)
+            if owner is not None:
+                working[token] = owner
+        #log.debug("found %d live tokens", len(working))
+        for cookie in working.items():
+            print("%s <- %s" % cookie)
+            self.session = { "session": token }
+        self.saveToFile(self.sessionfile,json.dumps(self.session,indent=4))
+        return True
+
+    def dateTest(self):
+        
+        stored_time = datetime.fromtimestamp(float(self.getFromFile(self.datefile)))
+    
+    def saveToFile(self,file, string):
+        with open(file, 'w') as f:
+            f.write(string)
+
+    def getFromFile(self,file):
+        if not os.path.exists(file):
+            return None
+
+        with open(file,'r') as f:
+            try:
+                read = f.readline().strip()
+            except:
+                read = None
+        return read
+        
+    def getJSON(self):
+        if not self.getSessionCookie():
+            print("Failed to get session cookie")
+            exit(1)
+        
+        USER_AGENT = {"User-Agent": "ars v1"}
+        r = requests.get(self.url_json, cookies=self.session, headers=USER_AGENT)
+        if r.status_code == 200:
+            self.saveToFile(self.jsonfile, r.text)
+            self.updateStoredDate()
+        else:
+            print("Error updating JSON")
+        
 
 class Users:
     def __init__(self, file):
@@ -65,8 +205,13 @@ class Users:
             print("|")
         #for u in self.users:
 
-    # def getPlace(self,day,star,id):
-    #     return self.timestamps[day][star-1]
+    def printReport(self):
+        self.print_users()
+        self.findFinishes()
+        self.printFinishOrder()
+        for d in range(1,12):
+            users.printDayReport(d, BOTH)
+            print("")
 
     def getUser(self,id):
         return self.udict[id]
@@ -107,6 +252,7 @@ class Users:
         #print(self.timestamps)
     
     def printDayReport(self,day, star):
+        print("Day {}".format(day))
         table = []
         for u in self.users:
             ts = u.getTimeStamps(day)
@@ -223,13 +369,9 @@ class Days:
         self.silver_ts = s_ts
         self.gold_ts = g_ts
 
-
+d = Data()
+print("Data was updated: {}".format(d.getDateString()))
 
 init(autoreset=True)
-users = Users(util.AOC_2020 + "\\JSON\\data.json")
-users.print_users()
-#users.printFinishOrder()
-users.findFinishes()
-#users.printPlaces(1, SILVER)
-users.printFinishOrder()
-users.printDayReport(10, BOTH)
+users = Users(util.AOC_COMMON + "\\Leaderboard\\data.json")
+users.printReport()

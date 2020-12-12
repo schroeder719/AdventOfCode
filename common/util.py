@@ -1,6 +1,7 @@
 import os
 
 AOC_2020="AOC\\2020"
+AOC_COMMON="AOC\\common"
 
 def readfile(filename,lines=True):
     with open(os.path.join(os.getcwd(),filename)) as f:
