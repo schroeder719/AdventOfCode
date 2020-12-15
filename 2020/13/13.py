@@ -3,7 +3,7 @@ import re
 import common.util as u
 #import common.comp as c
 import logging
-
+import time
 
 data = u.readfile(u.AOC_2020 + "\\13\\input.txt")
 
@@ -79,7 +79,8 @@ def part2():
     wt = []
     
 
-    i = 100000000000000
+    #i = 100000000000000
+    i = 0
     #i = int(s[0])
     found = False
 
@@ -115,4 +116,8 @@ def part2():
     print("{}".format(i))
         
 #print(1068781%7)
+tic = time.perf_counter()
 part2()
+toc = time.perf_counter()
+print(f"Completed in {toc - tic:0.4f} seconds")
+
