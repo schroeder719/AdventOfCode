@@ -12,8 +12,17 @@ import bs4
 import os
 from os import path
 
+import plotly.express as px
+import plotly.graph_objects as go
+#import numpy as np
+
+
+
 dt = datetime(2022, 1, 1)
 FUTURE_TIME = dt.replace(tzinfo=timezone.utc).timestamp()
+
+st = datetime(2020, 12, 1)
+START_TIME = st.replace(tzinfo=timezone.utc).timestamp()
 BOTH = 4
 GOLD = 2
 SILVER = 1
@@ -263,8 +272,7 @@ class Users:
                 continue
 
             if ts[1] == FUTURE_TIME or ts[1] == 0:
-                t1 = "-------------------" 
-                     
+                t1 = "-------------------"         
             else:
                 t1 = datetime.fromtimestamp(ts[SILVER])
             
@@ -285,7 +293,45 @@ class Users:
                 print("{: <30} {}".format(i[0], i[2]))
 
 
+    def graphFinishes(self):
+        # requires that findFishes be run first
+        class GraphData():
+            def __init__(self, name):
+                self.name = name
+                self.starFinishTimes = []
+                self.score = []
+            def addPoint(self, time, score):
+                self.starFinishTimes.append(time)
+                self.score.append(score)
 
+        userCount = len(self.users)
+        gdl = []
+        for u in self.users:
+            gd = GraphData(u.name)
+            gd.addPoint(datetime.fromtimestamp(START_TIME),0)
+            total_score = 0
+            for day in self.valid_days:
+                s = u.getPlace(day,SILVER)
+                g = u.getPlace(day,GOLD)
+                ts = u.getTimeStamps(day)
+                
+                if ts[SILVER] != 0 and ts[SILVER] != FUTURE_TIME:
+                    total_score += userCount-s
+                    gd.addPoint( datetime.fromtimestamp(ts[SILVER]),total_score)
+                    if ts[GOLD] != 0 and ts[GOLD] != FUTURE_TIME:
+                        total_score += userCount-g
+                        gd.addPoint( datetime.fromtimestamp(ts[GOLD]),total_score)
+
+
+            gdl.append(gd)
+                #ts = u.getTimeStamps(day)
+                #t = np.linspace(0, 2*np.pi, 100)
+        fig = go.Figure()
+        for u in gdl:
+            fig.add_trace(go.Scatter(x=u.starFinishTimes, y=u.score,
+                    mode='lines+markers',
+                    name=u.name))
+        fig.show()
 
 class User:
     # "name":"boilermaker__2015",
@@ -322,6 +368,8 @@ class User:
         elif star == SILVER:
             return self.splaces[day]
         return -1
+
+
 
 
 class Completion:
@@ -366,6 +414,10 @@ class Completion:
                 return (d.silver_ts,d.gold_ts)
         return (FUTURE_TIME,FUTURE_TIME)
 
+
+
+
+
 class Days:
     def __init__(self,day,s_ts,g_ts):
         self.day = day
@@ -378,3 +430,4 @@ print("Data was updated: {}".format(d.getDateString()))
 init(autoreset=True)
 users = Users(util.AOC_COMMON + "\\Leaderboard\\data.json")
 users.printReport()
+users.graphFinishes()
