@@ -10,17 +10,6 @@ import copy
 #data = u.readfile(u.AOC_2020 + "\\17\\input.txt")
 data = u.readfile(u.AOC_2020 + "\\17\\input_ex.txt")
 
-# print(data)
-# cube = []
-# for i in range(3):
-#     cube.append(data)
-
-# for z in range(3):
-#     for y in range(3):
-#         print(cube[x][y][z])
-#         # for x in range(3):
-#         #     print(cube[x][y][z])
-
 class Point:
     def __init__(self,x,y,z,w):
         self.x = x

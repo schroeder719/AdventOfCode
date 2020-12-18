@@ -27,16 +27,21 @@ BOTH = 4
 GOLD = 2
 SILVER = 1
 
+
+
 class Data:
     url_json = 'https://adventofcode.com/2020/leaderboard/private/view/614401.json'
     datefile = util.AOC_COMMON + '/Leaderboard/timestamp'
     sessionfile = util.AOC_COMMON + '/Leaderboard/session'
     jsonfile = util.AOC_COMMON + '/Leaderboard/data.json'
+    imagefolder = util.AOC_COMMON + '/Leaderboard/images/'
     min_elapsed_time = 900.0
     
     def __init__(self):
         self.session = {}
         self.checkStoredDate()
+        if not os.path.exists(self.imagefolder):
+            os.mkdir(self.imagefolder)
         
     def getDateFromFile(self):
         try:
@@ -293,7 +298,7 @@ class Users:
                 print("{: <30} {}".format(i[0], i[2]))
 
 
-    def graphFinishes(self):
+    def graphFinishes(self,show=True,fileName = None):
         # requires that findFishes be run first
         class GraphData():
             def __init__(self, name):
@@ -326,12 +331,17 @@ class Users:
             gdl.append(gd)
                 #ts = u.getTimeStamps(day)
                 #t = np.linspace(0, 2*np.pi, 100)
+        # for u in gdl:
+        #     print("{}: {}".format(u.name,u.score))
         fig = go.Figure()
         for u in gdl:
             fig.add_trace(go.Scatter(x=u.starFinishTimes, y=u.score,
                     mode='lines+markers',
                     name=u.name))
-        fig.show()
+        if fileName:
+            fig.write_image(os.path.join(Data.imagefolder,fileName), engine="kaleido", format="png", width=1920, height=1080, scale=1)
+        if show:
+            fig.show()
 
 class User:
     # "name":"boilermaker__2015",
@@ -430,4 +440,5 @@ print("Data was updated: {}".format(d.getDateString()))
 init(autoreset=True)
 users = Users(util.AOC_COMMON + "\\Leaderboard\\data.json")
 users.printReport()
-users.graphFinishes()
+users.graphFinishes(False, fileName="17.png")
+

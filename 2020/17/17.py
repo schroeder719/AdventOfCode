@@ -111,18 +111,6 @@ class Space:
         self.addCube(c)
 
     def addCube(self,c):
-        # if c.x >= self.xmx:
-        #     self.xmx = c.x +1
-        # if c.y >= self.ymx: 
-        #     self.ymx = c.y +1
-        # if c.z >= self.zmx:
-        #     self.zmx = c.z +1
-        # if c.x < self.xmn:
-        #     self.xmn = c.x
-        # if c.y < self.ymn: 
-        #     self.ymn = c.y
-        # if c.z < self.zmn:
-        #     self.zmn = c.z
         id = self.calcId(c.getPoint())
         c.setId(id)
         self.cubes[id] = c
@@ -194,45 +182,6 @@ class Space:
             c = Cube(p.x,p.y,p.z,state)
         
         self.cubes[id] = c
-            
-
-        # for c in self.cubes:
-        #     if c.isMatch(p.x,p.y,p.z):
-        #         tc = c
-        #         #self.cubes.remove(c)
-        #         #break
-        # if tc is not None:
-        #     tc.setState(state)
-        # else:
-        #     tc = Cube(p.x,p.y,p.z,state)
-        #     self.addCube(tc)
-
-    def fixNeighborList(self,nl):
-        for l in nl:
-            x = l.x
-            y = l.y
-            z = l.z
-            if x >= self.xmx:
-                x = self.xmn
-            if x < self.xmn:
-                x = self.xmx-1
-
-            if y >= self.ymx:
-                y = self.ymn
-            if y < self.ymn:
-                y = self.ymx-1
-
-            if z >= self.zmx:
-                z = self.zmn
-            if z < self.zmn:
-                z = self.zmx-1
-
-            if (x != l.x or y != l.y or z != l.z):
-                #print("({},{},{})->({},{},{})".format(l.x,l.y,l.z,x,y,z))
-                l.x = x
-                l.y = y
-                l.z = z
-        return nl
 
     def flex(self):
         for i in self.flexList:
