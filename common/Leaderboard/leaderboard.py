@@ -16,12 +16,15 @@ import plotly.express as px
 import plotly.graph_objects as go
 #import numpy as np
 
-
+YEAR_TO_RUN=2019
 
 dt = datetime(2022, 1, 1)
 FUTURE_TIME = dt.replace(tzinfo=timezone.utc).timestamp()
 
-st = datetime(2020, 12, 1)
+dt = datetime(YEAR_TO_RUN+1, 1, 1)
+END_OF_YEAR = dt.replace(tzinfo=timezone.utc).timestamp()
+
+st = datetime(YEAR_TO_RUN, 12, 1)
 START_TIME = st.replace(tzinfo=timezone.utc).timestamp()
 BOTH = 4
 GOLD = 2
@@ -29,8 +32,11 @@ SILVER = 1
 
 
 
+
+
 class Data:
-    url_json = 'https://adventofcode.com/2020/leaderboard/private/view/614401.json'
+    #url_json = 'https://adventofcode.com/2020/leaderboard/private/view/614401.json'
+    url_json = "https://adventofcode.com/" + str(YEAR_TO_RUN) + "/leaderboard/private/view/614401.json"
     datefile = util.AOC_COMMON + '/Leaderboard/timestamp'
     sessionfile = util.AOC_COMMON + '/Leaderboard/session'
     jsonfile = util.AOC_COMMON + '/Leaderboard/data.json'
@@ -201,7 +207,7 @@ class Users:
         print("-"*241)
         for u in self.users:
             print("{: <30} | {: <6} ".format(u.name, u.local_score), end="")
-            for d in range(0,25):
+            for d in range(1,26):
                 s = u.getPlace(d, SILVER)
                 g = u.getPlace(d, GOLD)
                 if s == 0:
@@ -249,7 +255,7 @@ class Users:
                     place+=1
                     u = self.getUser(i[0])
                     #print("{} {}".format(u.name,place))
-                    u.setPlace(d,SILVER,place)
+                    u.setPlace(d+1,SILVER,place)
             if place > 0:
                 self.valid_days.append(d+1)
             place = 0
@@ -259,7 +265,7 @@ class Users:
                     place+=1
                     u = self.getUser(i[0])
                     #print("{} {}".format(u.name,place))
-                    u.setPlace(d,GOLD,place)
+                    u.setPlace(d+1,GOLD,place)
         
     def printPlaces(self,day,star):
             for u in self.users:
@@ -320,10 +326,10 @@ class Users:
                 g = u.getPlace(day,GOLD)
                 ts = u.getTimeStamps(day)
                 
-                if ts[SILVER] != 0 and ts[SILVER] != FUTURE_TIME:
+                if ts[SILVER] != 0 and ts[SILVER] <= END_OF_YEAR:
                     total_score += userCount-s
                     gd.addPoint( datetime.fromtimestamp(ts[SILVER]),total_score)
-                    if ts[GOLD] != 0 and ts[GOLD] != FUTURE_TIME:
+                    if ts[GOLD] != 0 and ts[GOLD] <= END_OF_YEAR:
                         total_score += userCount-g
                         gd.addPoint( datetime.fromtimestamp(ts[GOLD]),total_score)
 
@@ -358,8 +364,8 @@ class User:
         self.last_star_ts = data['last_star_ts']
         self.stars = data['stars']
         self.CompletionLevel = Completion( data['completion_day_level'])
-        self.gplaces = [0]*25
-        self.splaces = [0]*25
+        self.gplaces = [0]*26 # days are not 0 indexed
+        self.splaces = [0]*26 #
     
     def getTimeStamps(self,day):
         ts = self.CompletionLevel.getTimeStamps(day)
@@ -367,16 +373,20 @@ class User:
 
     
     def setPlace(self,day, star, place):
+        assert day >=1 and day <= 25
+            
         if star == GOLD:
-            self.gplaces[day] = place
+            self.gplaces[day-1] = place
         elif star == SILVER:
-            self.splaces[day] = place
+            self.splaces[day-1] = place
 
     def getPlace(self,day,star):
+        assert day >=1 and day <= 25
+
         if star == GOLD:
-            return self.gplaces[day]
+            return self.gplaces[day-1]
         elif star == SILVER:
-            return self.splaces[day]
+            return self.splaces[day-1]
         return -1
 
 
@@ -440,5 +450,5 @@ print("Data was updated: {}".format(d.getDateString()))
 init(autoreset=True)
 users = Users(util.AOC_COMMON + "\\Leaderboard\\data.json")
 users.printReport()
-users.graphFinishes(False, fileName="17.png")
+users.graphFinishes(False, fileName=str(YEAR_TO_RUN)+"_17.png")
 

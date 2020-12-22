@@ -1,6 +1,7 @@
 import os
 
 AOC_2020="AOC\\2020"
+AOC_2019="AOC\\2019"
 AOC_COMMON="AOC\\common"
 
 def readfile(filename,lines=True):
