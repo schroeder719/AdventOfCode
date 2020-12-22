@@ -4,9 +4,6 @@ import common.util as u
 index = 0
 data = u.readfile(u.AOC_2020 + "\\19\\input.txt")
 
-R_TRUE = 1
-R_FALSE = 0
-R_INDEX = 2
 
 def run(data, rules, rnum):
     global index
@@ -18,7 +15,7 @@ def run(data, rules, rnum):
     tracev.append(rnum)
     # if index >= len(data):
     #     #print(rule)
-    #     return R_INDEX
+    #     return False
     if "a" in rule:
         try:
             if data[index] == "a":
@@ -26,22 +23,22 @@ def run(data, rules, rnum):
                 matched.append('a')
                 index+=1
                 tracec.append(rnum)
-                return R_TRUE
+                return True
             else:
-                return R_FALSE
+                return False
         except IndexError:
-            return R_INDEX
+            return False
     elif "b" in rule:
         try:
             if data[index] == "b":
                 matched.append('b')
                 index+=1
                 tracec.append(rnum)
-                return R_TRUE
+                return True
             else:
-                return R_FALSE
+                return False
         except IndexError:
-            return R_INDEX
+            return False
     elif "|" in rule:
         r = rule.split("|")
         ra = r[0].strip().split(" ")
@@ -52,12 +49,12 @@ def run(data, rules, rnum):
         for r in ra:
             r = int(r.strip())
             rtn = run(data,rules,r)
-            if  rtn == R_FALSE: #else run next rule
+            if  rtn == False: #else run next rule
                 try_b = True
                 break
-            elif rtn == R_INDEX:
+            elif rtn == False:
                 tracec.append(rnum)
-                return R_INDEX
+                return False
             
         if try_b:
             t = index-index_before
@@ -69,25 +66,25 @@ def run(data, rules, rnum):
             for r2 in rb:
                 r2 = int(r2.strip())
                 rtn = run(data,rules,r2)
-                if rtn == R_FALSE:
-                    return R_FALSE
-                elif rtn == R_INDEX:
+                if rtn == False:
+                    return False
+                elif rtn == False:
                     tracec.append(rnum)
-                    return R_INDEX
+                    return False
         tracec.append(rnum)
-        return R_TRUE
+        return True
     else:
         ra = rule.strip().split(" ")
         for r in ra:
             r = int(r.strip())
             rtn = run(data,rules,r)
-            if rtn == R_FALSE:
-                return R_FALSE
-            elif rtn == R_INDEX:
+            if rtn == False:
+                return False
+            elif rtn == False:
                 tracec.append(rnum)
-                return R_INDEX
+                return False
         tracec.append(rnum)
-        return R_TRUE
+        return True
     
 def report(line,trace, matched, count,result,file=None):
     if file is None:
@@ -122,18 +119,19 @@ with open(u.AOC_2020 + "\\19\\out_good.txt","w") as fg:
                     tracev = []
                     matched = []
                     rtn = run(line,rules,0)
-                    if rtn == R_TRUE:
+                    if rtn == True:
                         count+=1
-
                         report(line,tracev,matched,count,"TRUE",fg)
-                    elif rtn == R_INDEX:
-                        if index >= len(line):
+                    elif rtn == False:
+                        if index == len(line):
+                            print(tracev[-4:], end="")
+                            print(" " + str(tracec[-4:]))
                             if  tracec[-2:] == [31,11] or tracec[-3:] == [31,11,0]:
                                 count+=1
+
                             else:
                                 #print(index, len(line))
-                                print(tracev[-4:], end="")
-                                print(" " + str(tracec[-4:]))
+
                             
                             #fortytwo = [i for i, x in enumerate(tracec[:-2]) if x == 42]
                             #thirtyone = [i for i, x in enumerate(tracec[:-2]) if x == 31]
@@ -148,11 +146,12 @@ with open(u.AOC_2020 + "\\19\\out_good.txt","w") as fg:
                             #    pass
 
                         else:
-                            #report(line,trace,matched,count,"FALSE INDEX >")
+                            report(line,tracec,matched,0,"TRUE-INDEX", fb)    
                             pass
 
                     else:
-                        #report(line,trace,matched,count,"FALSE")
+                        print("error")
+                        exit(1)
                         pass
 print("count: {}".format(count))
 print("count2: {}".format(count2))
