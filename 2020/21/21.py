@@ -9,6 +9,8 @@ import math
 
 info = dict()
 
+class 
+
 #data = u.readfile(u.AOC_2020 + "\\21\\input_ex.txt")
 data = u.readfile(u.AOC_2020 + "\\21\\input.txt")
 food = []
@@ -32,12 +34,32 @@ for f in food:
   
 
 #print(food)
+freq = dict()
 print(all_ingredients)
 ingredients_witout_alergies = all_ingredients.copy()
 for k in info.keys():
     print("{} : {}".format(k,info[k]))
     ingredients_witout_alergies = ingredients_witout_alergies - info[k]
-print(ingredients_witout_alergies)
+
+    for ing in info[k]:
+        if ing in freq.keys():
+            i = freq[ing]
+            i+=1
+            freq[ing] = i
+        else:
+            freq[ing] = 1
+
+while not done:
+    
+    for k in freq.keys():
+        print("{} = {}".format(k,freq[k]))
+
+
+    for k in info.keys():
+    
+
+#print(ingredients_witout_alergies)
+incgredients_with_alergies = all_ingredients - ingredients_witout_alergies
 
 count = 0
 for f in food:

@@ -32,6 +32,9 @@ class Game:
             self.decks.append(deck)   
         self.numPlayers = player+1
 
+        
+
+
     def printDecks(self):
         for i in range(self.numPlayers):
             print("Player {}".format(i))
