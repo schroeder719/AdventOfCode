@@ -133,9 +133,7 @@ for b in basins[-3:]:
     supply *=b
 print(supply)
 
-        #    print("{},{}".format(r,c))
-
-
+#    print("{},{}".format(r,c))
 # for i in data[0]:
 #     if i != ',':
 #         fish.append(int(i))

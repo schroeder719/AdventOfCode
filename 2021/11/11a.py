@@ -9,10 +9,12 @@ from collections import deque
 def increase(a, v=1):
     for row in range(len(a)):
         for col in range(len(a[row])):
-            a[row,col] +=1
+            if a[row,col] >= 0:
+                a[row,col] +=1
     return a
 
 def flash(g):
+    rtn = False
     for row in range(len(a)):
         if row == 0:
             t=0
@@ -36,21 +38,26 @@ def flash(g):
                 l = 1
                 r = 2
 
-            if g[row,col] >= 9:
-                increase(g[(row-t):(row+b), (col-l):(col+r)])
-                g[row,col] == -1
-                flash(g[(row-t):(row+b), (col-l):(col+r)])
+            if g[row,col] > 9:
+                local = g[(row-t):(row+b), (col-l):(col+r)]
+                increase(local)
+                g[row,col] = -1
+                rtn = True
+
+    return rtn
 
 def reset(a,counter):
+    round_counter = 0
     for row in range(len(a)):
         for col in range(len(data[row])):
             if a[row,col] == -1:
                 a[row,col] = 0
-                counter+=1
-    return a,counter
+                round_counter+=1
+    counter+=round_counter
+    return a,counter,round_counter
 
 if __name__ == "__main__":
-    data = u.readfile(u.AOC_2021 + "\\11\\input_test.txt",Integer=False)
+    data = u.readfile(u.AOC_2021 + "\\11\\input.txt",Integer=False)
 
     for i in range(len(data)):
         t = []
@@ -62,13 +69,21 @@ if __name__ == "__main__":
     # f.fill(1)
     # print(f)    
     counter = 0
-    for s in range(10):
+    print(a)
+    for s in range(1000):
+        #print(s)
         #step 1
         increase(a)
+        #print(a)
         #step 2
-        flash(a)
+        while flash(a): pass
+            #print(a)
         #step 3
-        reset(a,counter)
+        a, counter,rc = reset(a,counter)
+        if rc == 100:
+            print("sync round: {}".format(s+1))
+            break
+    print(a)
     print(counter)
         #print(" X ")
         #print(a[r][c])
